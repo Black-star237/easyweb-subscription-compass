@@ -41,7 +41,14 @@ const AuthPage: React.FC = () => {
       }
     });
     if (error) {
-      toast.error(`Erreur d'inscription: ${error.message}`);
+      // Amélioration de la gestion d'erreur pour les limites de taux
+      if (error.message.includes('email_send_rate_limit') || error.message.includes('security purposes')) {
+        toast.error("Trop de tentatives d'inscription. Veuillez attendre 58 secondes avant de réessayer.");
+      } else if (error.message.includes('User already registered')) {
+        toast.error("Un compte existe déjà avec cet email. Essayez de vous connecter à la place.");
+      } else {
+        toast.error(`Erreur d'inscription: ${error.message}`);
+      }
     } else {
       toast.success("Inscription réussie ! Veuillez vérifier vos e-mails pour confirmer votre compte.");
       // Optionnel: rediriger ou afficher un message spécifique après inscription
