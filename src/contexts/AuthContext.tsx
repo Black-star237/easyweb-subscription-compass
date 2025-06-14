@@ -43,26 +43,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     getInitialSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+    const { data: authListenerData } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         console.log("Auth state changed:", _event, newSession);
         setSession(newSession);
         setUser(newSession?.user ?? null);
         if (newSession?.user) {
-          setLoading(true);
-          await fetchProfile(newSession.user.id);
-          setLoading(false);
+          // Defer profile fetching to avoid potential deadlocks
+          setTimeout(async () => {
+            setLoading(true); // Set loading true before fetching profile
+            await fetchProfile(newSession.user.id);
+            setLoading(false); // Set loading false after fetching profile
+          }, 0);
         } else {
           setProfile(null);
-          setLoading(false);
+          // Ensure loading is false if no user/session
+          // This might already be handled by getInitialSession's setLoading(false)
+          // but good to be explicit if a state change leads here without a user.
+          if (loading) setLoading(false);
         }
       }
     );
 
     return () => {
-      authListener?.unsubscribe();
+      authListenerData?.subscription.unsubscribe();
     };
-  }, []);
+  }, [loading]); // Added loading to dependency array, as it's modified within setTimeout
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -133,3 +139,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
