@@ -50,9 +50,9 @@ const SubscriptionTable = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Badge className="status-badge status-paid">Payé</Badge>;
+        return <Badge className="status-badge status-paid">Actif</Badge>;
       case 'pending':
-        return <Badge className="status-badge status-pending">En attente</Badge>;
+        return <Badge className="status-badge status-pending">Dû aujourd'hui</Badge>;
       case 'overdue':
         return <Badge className="status-badge status-overdue">En retard</Badge>;
       default:
@@ -213,8 +213,8 @@ const SubscriptionTable = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-white z-50">
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="paid">Payé</SelectItem>
-                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="paid">Actif</SelectItem>
+                  <SelectItem value="pending">Dû aujourd'hui</SelectItem>
                   <SelectItem value="overdue">En retard</SelectItem>
                 </SelectContent>
               </Select>

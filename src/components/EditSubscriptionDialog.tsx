@@ -36,8 +36,6 @@ const EditSubscriptionDialog: React.FC<EditSubscriptionDialogProps> = ({ subscri
         website_url: values.websiteUrl,
         admin_url: values.adminUrl,
         notion_url: values.notionUrl,
-        days_remaining: 0, // This will be calculated automatically, so we just keep a default
-        payment_status: values.paymentStatus,
         next_payment_date: values.nextPaymentDate,
         notes: values.notes,
       })
@@ -64,7 +62,6 @@ const EditSubscriptionDialog: React.FC<EditSubscriptionDialogProps> = ({ subscri
           <Input {...register("adminUrl")} placeholder="URL admin" required />
           <Input {...register("notionUrl")} placeholder="Lien Notion" />
           <Input {...register("nextPaymentDate")} type="date" placeholder="Prochaine échéance" required />
-          <Input {...register("paymentStatus")} placeholder="Statut (paid|pending|overdue)" required />
           <Input {...register("notes")} placeholder="Notes" />
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
