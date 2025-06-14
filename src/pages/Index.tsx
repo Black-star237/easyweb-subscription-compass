@@ -29,11 +29,11 @@ const Index = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
+        <div className="mb-8 bg-white/70 backdrop-blur-md rounded-lg p-6 shadow-sm border border-white/20">
           <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
             Gestionnaire d'abonnements
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-gray-700">
             Gérez et suivez tous vos abonnements clients en un seul endroit
           </p>
         </div>

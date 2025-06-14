@@ -51,7 +51,7 @@ const BackgroundCustomizer = () => {
 
   if (backgroundsLoading) {
     return (
-      <Card>
+      <Card className="bg-white/80 backdrop-blur-md border border-white/20">
         <CardHeader>
           <CardTitle>Personnalisation de l'arrière-plan</CardTitle>
         </CardHeader>
@@ -68,7 +68,7 @@ const BackgroundCustomizer = () => {
   return (
     <div className="space-y-6">
       {/* Upload Section */}
-      <Card>
+      <Card className="bg-white/80 backdrop-blur-md border border-white/20">
         <CardHeader>
           <CardTitle>Ajouter un arrière-plan</CardTitle>
         </CardHeader>
@@ -81,6 +81,7 @@ const BackgroundCustomizer = () => {
                 placeholder="Nom de votre arrière-plan"
                 value={uploadName}
                 onChange={(e) => setUploadName(e.target.value)}
+                className="bg-white/50 border-white/30"
               />
             </div>
             <div>
@@ -90,6 +91,7 @@ const BackgroundCustomizer = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
+                className="bg-white/50 border-white/30"
               />
             </div>
           </div>
@@ -105,7 +107,7 @@ const BackgroundCustomizer = () => {
       </Card>
 
       {/* Blur Control */}
-      <Card>
+      <Card className="bg-white/80 backdrop-blur-md border border-white/20">
         <CardHeader>
           <CardTitle>Niveau de flou</CardTitle>
         </CardHeader>
@@ -124,7 +126,7 @@ const BackgroundCustomizer = () => {
       </Card>
 
       {/* Background Selection */}
-      <Card>
+      <Card className="bg-white/80 backdrop-blur-md border border-white/20">
         <CardHeader>
           <CardTitle>Mes arrière-plans</CardTitle>
         </CardHeader>

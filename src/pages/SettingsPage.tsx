@@ -25,11 +25,11 @@ const SettingsPage = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
+        <div className="mb-8 bg-white/70 backdrop-blur-md rounded-lg p-6 shadow-sm border border-white/20">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
-            className="mb-4"
+            className="mb-4 hover:bg-white/20"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour au tableau de bord
@@ -38,7 +38,7 @@ const SettingsPage = () => {
           <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
             Paramètres
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-gray-700">
             Personnalisez l'apparence de votre application
           </p>
         </div>
@@ -49,7 +49,7 @@ const SettingsPage = () => {
           </div>
           
           <div>
-            <Card className="bg-white/90 backdrop-blur-sm">
+            <Card className="bg-white/80 backdrop-blur-md border border-white/20">
               <CardHeader>
                 <CardTitle>Informations du compte</CardTitle>
               </CardHeader>
@@ -58,7 +58,7 @@ const SettingsPage = () => {
                   <p className="text-sm">
                     <span className="font-medium">Email:</span> {user.email}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600">
                     Connecté depuis: {new Date(user.created_at || '').toLocaleDateString('fr-FR')}
                   </p>
                 </div>

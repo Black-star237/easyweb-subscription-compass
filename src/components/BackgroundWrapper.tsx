@@ -38,14 +38,14 @@ const BackgroundWrapper = ({ children }: BackgroundWrapperProps) => {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            filter: `blur(${blurValue * 0.1}px)`,
+            filter: `blur(${blurValue * 0.2}px)`,
           }}
         />
       )}
       
-      {/* Semi-transparent overlay for better readability */}
+      {/* Light overlay for better contrast */}
       {backgroundImage && (
-        <div className="fixed inset-0 z-10 bg-white/10 backdrop-blur-[1px]" />
+        <div className="fixed inset-0 z-10 bg-white/5" />
       )}
       
       {/* Content layer */}
