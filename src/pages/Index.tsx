@@ -1,12 +1,26 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import Header from '@/components/Header';
+import DashboardStats from '@/components/DashboardStats';
+import SubscriptionTable from '@/components/SubscriptionTable';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <main className="container mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
+            Gestionnaire d'abonnements
+          </h1>
+          <p className="text-muted-foreground">
+            Gérez et suivez tous vos abonnements clients en un seul endroit
+          </p>
+        </div>
+        
+        <DashboardStats />
+        <SubscriptionTable />
+      </main>
     </div>
   );
 };
