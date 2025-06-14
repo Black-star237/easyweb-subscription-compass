@@ -22,11 +22,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
-import { mockSubscriptions } from '@/data/mockData';
-import { Subscription, FilterOptions } from '@/types/subscription';
+import { useSubscriptions } from '@/hooks/useSubscriptions';
+import { FilterOptions } from '@/types/subscription';
 
 const SubscriptionTable = () => {
-  const [subscriptions] = useState<Subscription[]>(mockSubscriptions);
+  const { subscriptions, loading, error } = useSubscriptions();
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     paymentStatus: 'all',
@@ -67,6 +67,18 @@ const SubscriptionTable = () => {
     const message = encodeURIComponent(`Bonjour, concernant l'abonnement de ${companyName}...`);
     window.open(`https://wa.me/${number.replace(/\s+/g, '')}?text=${message}`, '_blank');
   };
+
+  if (error) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="text-center text-red-600">
+            Erreur lors du chargement des données: {error}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -132,132 +144,143 @@ const SubscriptionTable = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-easyweb-red"></div>
+          </div>
+        )}
+
         {/* Table */}
-        <div className="rounded-md border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="w-[60px]">Logo</TableHead>
-                <TableHead>Entreprise</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Liens</TableHead>
-                <TableHead>Échéance</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSubscriptions.map((subscription) => (
-                <TableRow key={subscription.id} className="hover:bg-muted/30 transition-colors">
-                  <TableCell>
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-easyweb-red to-easyweb-orange text-white font-semibold">
-                        {subscription.companyName.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-medium">{subscription.companyName}</div>
-                    <div className="text-sm text-muted-foreground">{subscription.clientName}</div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="font-medium">{subscription.clientName}</div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openWhatsApp(subscription.whatsappNumber, subscription.companyName)}
-                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-1" />
-                      WhatsApp
-                    </Button>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <a
-                        href={subscription.websiteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
-                      >
-                        <ExternalLink className="w-3 h-3 mr-1" />
-                        Site
-                      </a>
-                      <a
-                        href={subscription.adminUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm text-purple-600 hover:text-purple-700"
-                      >
-                        <Settings className="w-3 h-3 mr-1" />
-                        Admin
-                      </a>
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    <div className={`text-sm ${getDaysRemainingStyle(subscription.daysRemaining)}`}>
-                      {subscription.daysRemaining > 0 
-                        ? `${subscription.daysRemaining} jours restants`
-                        : 'Échu'
-                      }
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(subscription.nextPaymentDate).toLocaleDateString('fr-FR')}
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell>
-                    {getStatusBadge(subscription.paymentStatus)}
-                  </TableCell>
-                  
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm">
-                        Détails
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-easyweb-red hover:text-easyweb-red/80">
-                        Relancer
-                      </Button>
-                    </div>
-                  </TableCell>
+        {!loading && (
+          <div className="rounded-md border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-[60px]">Logo</TableHead>
+                  <TableHead>Entreprise</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Liens</TableHead>
+                  <TableHead>Échéance</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {filteredSubscriptions.map((subscription) => (
+                  <TableRow key={subscription.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell>
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback className="bg-gradient-to-br from-easyweb-red to-easyweb-orange text-white font-semibold">
+                          {subscription.companyName.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="font-medium">{subscription.companyName}</div>
+                      <div className="text-sm text-muted-foreground">{subscription.clientName}</div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="font-medium">{subscription.clientName}</div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openWhatsApp(subscription.whatsappNumber, subscription.companyName)}
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        WhatsApp
+                      </Button>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <a
+                          href={subscription.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
+                        >
+                          <ExternalLink className="w-3 h-3 mr-1" />
+                          Site
+                        </a>
+                        <a
+                          href={subscription.adminUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-sm text-purple-600 hover:text-purple-700"
+                        >
+                          <Settings className="w-3 h-3 mr-1" />
+                          Admin
+                        </a>
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      <div className={`text-sm ${getDaysRemainingStyle(subscription.daysRemaining)}`}>
+                        {subscription.daysRemaining > 0 
+                          ? `${subscription.daysRemaining} jours restants`
+                          : 'Échu'
+                        }
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(subscription.nextPaymentDate).toLocaleDateString('fr-FR')}
+                      </div>
+                    </TableCell>
+                    
+                    <TableCell>
+                      {getStatusBadge(subscription.paymentStatus)}
+                    </TableCell>
+                    
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm">
+                          Détails
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-easyweb-red hover:text-easyweb-red/80">
+                          Relancer
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
         {/* Pagination */}
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="text-sm text-muted-foreground">
-            Affichage de 1 à 5 sur {filteredSubscriptions.length} résultats
+        {!loading && (
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="text-sm text-muted-foreground">
+              Affichage de 1 à {filteredSubscriptions.length} sur {filteredSubscriptions.length} résultats
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" disabled>
+                Précédent
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-easyweb-red text-white hover:bg-easyweb-red/90"
+              >
+                1
+              </Button>
+              <Button variant="outline" size="sm">
+                2
+              </Button>
+              <Button variant="outline" size="sm">
+                Suivant
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" disabled>
-              Précédent
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-easyweb-red text-white hover:bg-easyweb-red/90"
-            >
-              1
-            </Button>
-            <Button variant="outline" size="sm">
-              2
-            </Button>
-            <Button variant="outline" size="sm">
-              Suivant
-            </Button>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
