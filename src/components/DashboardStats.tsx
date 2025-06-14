@@ -79,7 +79,7 @@ const DashboardStats = () => {
       title: "En attente",
       value: pendingSubscriptions,
       description: "Paiements attendus",
-      color: "text-yellow-600"
+      color: "text-orange-600"
     },
     {
       title: "En retard",
