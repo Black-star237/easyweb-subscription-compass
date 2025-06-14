@@ -1,9 +1,34 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscriptions } from '@/hooks/useSubscriptions';
+import { useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const DashboardStats = () => {
-  const { subscriptions, loading } = useSubscriptions();
+  const { subscriptions, loading, refetch } = useSubscriptions();
+
+  // Écouter les changements en temps réel sur la table subscriptions
+  useEffect(() => {
+    const channel = supabase
+      .channel('subscription-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Écouter tous les événements (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'subscriptions'
+        },
+        () => {
+          console.log('Changement détecté dans les abonnements, mise à jour des statistiques...');
+          refetch(); // Recharger les données
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   if (loading) {
     return (
