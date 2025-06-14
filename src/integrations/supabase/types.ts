@@ -84,6 +84,74 @@ export type Database = {
         }
         Relationships: []
       }
+      user_backgrounds: {
+        Row: {
+          blur_level: number
+          created_at: string
+          id: string
+          image_url: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blur_level?: number
+          created_at?: string
+          id?: string
+          image_url: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blur_level?: number
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          active_background_id: string | null
+          background_blur: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_background_id?: string | null
+          background_blur?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_background_id?: string | null
+          background_blur?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_settings_active_background_id_fkey"
+            columns: ["active_background_id"]
+            isOneToOne: false
+            referencedRelation: "user_backgrounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

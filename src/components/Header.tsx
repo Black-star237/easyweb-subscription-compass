@@ -1,5 +1,4 @@
-
-import { Bell, User, LogOut, LogIn } from 'lucide-react';
+import { Bell, User, LogOut, LogIn, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -34,7 +33,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm shadow-sm">
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center space-x-4">
           <Link to="/" className="flex items-center space-x-2">
@@ -91,13 +90,16 @@ const Header = () => {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-white z-[100]"> {/* Augmenter z-index si nécessaire */}
+              <DropdownMenuContent align="end" className="w-56 bg-white z-[100]">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   Profil (Bientôt)
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  Paramètres (Bientôt)
+                <DropdownMenuItem asChild>
+                  <Link to="/settings" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Paramètres
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
