@@ -29,6 +29,7 @@ const BackgroundWrapper = ({ children }: BackgroundWrapperProps) => {
 
   return (
     <div className="relative min-h-screen">
+      {/* Background layer */}
       {backgroundImage && (
         <div 
           className="fixed inset-0 z-0"
@@ -41,10 +42,14 @@ const BackgroundWrapper = ({ children }: BackgroundWrapperProps) => {
           }}
         />
       )}
+      
+      {/* Semi-transparent overlay for better readability */}
       {backgroundImage && (
-        <div className="fixed inset-0 z-10 bg-white/20" />
+        <div className="fixed inset-0 z-10 bg-white/10 backdrop-blur-[1px]" />
       )}
-      <div className="relative z-20">
+      
+      {/* Content layer */}
+      <div className="relative z-20 min-h-screen">
         {children}
       </div>
     </div>

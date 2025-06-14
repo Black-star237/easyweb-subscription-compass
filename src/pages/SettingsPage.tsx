@@ -14,18 +14,18 @@ const SettingsPage = () => {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-easyweb-red"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
+        <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
@@ -49,7 +49,7 @@ const SettingsPage = () => {
           </div>
           
           <div>
-            <Card>
+            <Card className="bg-white/90 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle>Informations du compte</CardTitle>
               </CardHeader>

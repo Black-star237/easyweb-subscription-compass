@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import DashboardStats from '@/components/DashboardStats';
 import SubscriptionTable from '@/components/SubscriptionTable';
-import { useAuth } from '@/hooks/useAuth'; // Importer useAuth
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const { user, loading: authLoading } = useAuth();
@@ -17,21 +17,19 @@ const Index = () => {
   }, [user, authLoading, navigate]);
 
   if (authLoading || !user) {
-    // Afficher un indicateur de chargement ou une page vide pendant la vérification
-    // ou la redirection pour éviter un flash de contenu non authentifié.
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-easyweb-red"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <Header />
       
       <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
+        <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-sm">
           <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
             Gestionnaire d'abonnements
           </h1>
