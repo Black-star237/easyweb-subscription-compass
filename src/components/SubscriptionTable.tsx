@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings } from 'lucide-react';
+import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,12 +22,19 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useSubscriptions } from '@/hooks/useSubscriptions';
-import { FilterOptions } from '@/types/subscription';
+import { FilterOptions, Subscription } from '@/types/subscription';
 import AddSubscriptionDialog from './AddSubscriptionDialog';
+import EditSubscriptionDialog from './EditSubscriptionDialog';
+import ConfirmDeleteDialog from './ConfirmDeleteDialog';
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const SubscriptionTable = () => {
   const { subscriptions, loading, error, refetch } = useSubscriptions();
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editSubscription, setEditSubscription] = useState<Subscription | null>(null);
+  const [deleteSubscription, setDeleteSubscription] = useState<Subscription | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     paymentStatus: 'all',
@@ -36,6 +42,8 @@ const SubscriptionTable = () => {
     sortOrder: 'asc',
     showOnlyDueSoon: false
   });
+
+  const { toast } = useToast();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -61,7 +69,6 @@ const SubscriptionTable = () => {
                          subscription.clientName.toLowerCase().includes(filters.search.toLowerCase());
     const matchesStatus = filters.paymentStatus === 'all' || subscription.paymentStatus === filters.paymentStatus;
     const matchesDueSoon = !filters.showOnlyDueSoon || subscription.daysRemaining <= 7;
-    
     return matchesSearch && matchesStatus && matchesDueSoon;
   });
 
@@ -72,6 +79,29 @@ const SubscriptionTable = () => {
 
   const handleSubscriptionAdded = () => {
     refetch();
+  };
+
+  const handleSubscriptionUpdated = () => {
+    setEditSubscription(null);
+    refetch();
+    toast({ title: "Modifié", description: "L'abonnement a été mis à jour avec succès.", variant: "success" });
+  };
+
+  const handleDelete = async () => {
+    if (!deleteSubscription) return;
+    setDeleting(true);
+    const { error } = await supabase
+      .from('subscriptions')
+      .delete()
+      .eq('id', deleteSubscription.id);
+    setDeleting(false);
+    setDeleteSubscription(null);
+    if (!error) {
+      toast({ title: "Supprimé", description: "L'abonnement a été supprimé.", variant: "success" });
+      refetch();
+    } else {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    }
   };
 
   if (error) {
@@ -250,11 +280,22 @@ const SubscriptionTable = () => {
                       
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm">
-                            Détails
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditSubscription(subscription)}
+                            title="Modifier"
+                          >
+                            <Edit className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-easyweb-red hover:text-easyweb-red/80">
-                            Relancer
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-easyweb-red hover:text-easyweb-red/80"
+                            onClick={() => setDeleteSubscription(subscription)}
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -298,6 +339,21 @@ const SubscriptionTable = () => {
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
         onSubscriptionAdded={handleSubscriptionAdded}
+      />
+
+      <EditSubscriptionDialog
+        subscription={editSubscription}
+        open={!!editSubscription}
+        onOpenChange={open => { if (!open) setEditSubscription(null); }}
+        onSubscriptionUpdated={handleSubscriptionUpdated}
+      />
+
+      <ConfirmDeleteDialog
+        open={!!deleteSubscription}
+        onCancel={() => setDeleteSubscription(null)}
+        onConfirm={handleDelete}
+        loading={deleting}
+        subscription={deleteSubscription}
       />
     </>
   );
