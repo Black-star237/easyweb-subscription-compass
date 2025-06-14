@@ -40,7 +40,6 @@ const AddSubscriptionDialog: React.FC<AddSubscriptionDialogProps> = ({
     websiteUrl: '',
     adminUrl: '',
     notionUrl: '',
-    daysRemaining: '',
     paymentStatus: 'pending' as 'paid' | 'pending' | 'overdue',
     nextPaymentDate: '',
     notes: ''
@@ -62,7 +61,6 @@ const AddSubscriptionDialog: React.FC<AddSubscriptionDialogProps> = ({
       websiteUrl: '',
       adminUrl: '',
       notionUrl: '',
-      daysRemaining: '',
       paymentStatus: 'pending',
       nextPaymentDate: '',
       notes: ''
@@ -83,7 +81,7 @@ const AddSubscriptionDialog: React.FC<AddSubscriptionDialogProps> = ({
           website_url: formData.websiteUrl,
           admin_url: formData.adminUrl,
           notion_url: formData.notionUrl || null,
-          days_remaining: parseInt(formData.daysRemaining) || 0,
+          days_remaining: 0, // This will be calculated automatically, so we just set a default
           payment_status: formData.paymentStatus,
           next_payment_date: formData.nextPaymentDate,
           notes: formData.notes || null
@@ -111,7 +109,7 @@ const AddSubscriptionDialog: React.FC<AddSubscriptionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Ajouter un nouvel abonnement</DialogTitle>
           <DialogDescription>
-            Remplissez les informations pour créer un nouvel abonnement client.
+            Remplissez les informations pour créer un nouvel abonnement client. Les jours restants seront calculés automatiquement.
           </DialogDescription>
         </DialogHeader>
 
@@ -140,30 +138,15 @@ const AddSubscriptionDialog: React.FC<AddSubscriptionDialogProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsappNumber">Numéro WhatsApp *</Label>
-              <Input
-                id="whatsappNumber"
-                value={formData.whatsappNumber}
-                onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
-                placeholder="Ex: +33 6 12 34 56 78"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="daysRemaining">Jours restants *</Label>
-              <Input
-                id="daysRemaining"
-                type="number"
-                value={formData.daysRemaining}
-                onChange={(e) => handleInputChange('daysRemaining', e.target.value)}
-                placeholder="Ex: 30"
-                min="0"
-                required
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="whatsappNumber">Numéro WhatsApp *</Label>
+            <Input
+              id="whatsappNumber"
+              value={formData.whatsappNumber}
+              onChange={(e) => handleInputChange('whatsappNumber', e.target.value)}
+              placeholder="Ex: +33 6 12 34 56 78"
+              required
+            />
           </div>
 
           <div className="space-y-2">

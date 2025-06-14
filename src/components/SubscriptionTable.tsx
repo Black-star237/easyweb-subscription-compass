@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2, Link as LinkIcon, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,6 +28,7 @@ import EditSubscriptionDialog from './EditSubscriptionDialog';
 import ConfirmDeleteDialog from './ConfirmDeleteDialog';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { formatDaysRemaining } from '@/utils/dateUtils';
 
 const SubscriptionTable = () => {
   const { subscriptions, loading, error, refetch } = useSubscriptions();
@@ -355,10 +355,7 @@ const SubscriptionTable = () => {
                       
                       <TableCell>
                         <div className={`text-sm ${getDaysRemainingStyle(subscription.daysRemaining)}`}>
-                          {subscription.daysRemaining > 0 
-                            ? `${subscription.daysRemaining} jours restants`
-                            : 'Échu'
-                          }
+                          {formatDaysRemaining(subscription.daysRemaining)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {new Date(subscription.nextPaymentDate).toLocaleDateString('fr-FR')}

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Subscription } from '@/types/subscription';
+import { calculateDaysRemaining } from '@/utils/dateUtils';
 
 export const useSubscriptions = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -20,7 +21,7 @@ export const useSubscriptions = () => {
         throw error;
       }
 
-      // Transformer les données pour correspondre au type Subscription
+      // Transform data and calculate remaining days automatically
       const transformedData: Subscription[] = data.map(item => ({
         id: item.id,
         companyName: item.company_name,
@@ -30,7 +31,7 @@ export const useSubscriptions = () => {
         websiteUrl: item.website_url,
         adminUrl: item.admin_url,
         notionUrl: item.notion_url,
-        daysRemaining: item.days_remaining,
+        daysRemaining: calculateDaysRemaining(item.next_payment_date), // Automatically calculated
         paymentStatus: item.payment_status as 'paid' | 'pending' | 'overdue',
         nextPaymentDate: item.next_payment_date,
         notes: item.notes,
