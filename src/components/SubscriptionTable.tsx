@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2 } from 'lucide-react';
+import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -259,6 +259,17 @@ const SubscriptionTable = () => {
                             <Settings className="w-3 h-3 mr-1" />
                             Admin
                           </a>
+                          {subscription.notionUrl && (
+                            <a
+                              href={subscription.notionUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-sm text-gray-700 hover:text-gray-900"
+                            >
+                              <LinkIcon className="w-3 h-3 mr-1" />
+                              Notion
+                            </a>
+                          )}
                         </div>
                       </TableCell>
                       
