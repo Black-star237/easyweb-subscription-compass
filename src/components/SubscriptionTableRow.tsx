@@ -3,7 +3,6 @@ import React from 'react';
 import { ExternalLink, MessageCircle, Settings, Edit, Trash2, Link as LinkIcon, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Subscription } from '@/types/subscription';
 import { formatDaysRemaining } from '@/utils/dateUtils';
@@ -26,13 +25,13 @@ const SubscriptionTableRow: React.FC<SubscriptionTableRowProps> = ({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Badge className="status-badge status-paid">Actif</Badge>;
+        return <span className="status-badge status-paid">Actif</span>;
       case 'pending':
-        return <Badge className="status-badge status-pending">Dû aujourd'hui</Badge>;
+        return <span className="status-badge status-pending">Dû aujourd'hui</span>;
       case 'overdue':
-        return <Badge className="status-badge status-overdue">En retard</Badge>;
+        return <span className="status-badge status-overdue">En retard</span>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <span className="status-badge">{status}</span>;
     }
   };
 
