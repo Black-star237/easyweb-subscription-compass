@@ -23,11 +23,19 @@ const DashboardStats = () => {
     );
   }
 
+  // Calculer les statistiques réelles à partir des données de la base
   const totalSubscriptions = subscriptions.length;
   const activeSubscriptions = subscriptions.filter(s => s.paymentStatus === 'paid').length;
   const pendingSubscriptions = subscriptions.filter(s => s.paymentStatus === 'pending').length;
   const overdueSubscriptions = subscriptions.filter(s => s.paymentStatus === 'overdue').length;
-  const dueSoon = subscriptions.filter(s => s.daysRemaining <= 7).length;
+  
+  // Calculer les abonnements qui expirent bientôt (dans les 7 prochains jours)
+  const dueSoon = subscriptions.filter(s => {
+    if (s.paymentStatus === 'paid' && s.daysRemaining <= 7 && s.daysRemaining > 0) {
+      return true;
+    }
+    return false;
+  }).length;
 
   const stats = [
     {
