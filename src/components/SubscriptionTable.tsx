@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2, Link as LinkIcon } from 'lucide-react';
+import { Search, Filter, Download, Plus, ExternalLink, MessageCircle, Settings, Edit, Trash2, Link as LinkIcon, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useSubscriptions } from '@/hooks/useSubscriptions';
 import { FilterOptions, Subscription } from '@/types/subscription';
@@ -35,6 +36,7 @@ const SubscriptionTable = () => {
   const [editSubscription, setEditSubscription] = useState<Subscription | null>(null);
   const [deleteSubscription, setDeleteSubscription] = useState<Subscription | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterOptions>({
     search: '',
     paymentStatus: 'all',
@@ -77,6 +79,57 @@ const SubscriptionTable = () => {
     window.open(`https://wa.me/${number.replace(/\s+/g, '')}?text=${message}`, '_blank');
   };
 
+  const handleLogoUpload = async (subscriptionId: string, file: File) => {
+    try {
+      setUploadingLogo(subscriptionId);
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${subscriptionId}_${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('subscription-logos')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('subscription-logos')
+        .getPublicUrl(fileName);
+
+      // Update subscription record with logo URL
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({ logo: publicUrl })
+        .eq('id', subscriptionId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      toast({ 
+        title: "Logo mis à jour", 
+        description: "Le logo a été téléchargé avec succès.", 
+        variant: "default" 
+      });
+      
+      refetch();
+    } catch (error) {
+      console.error('Erreur lors du téléchargement du logo:', error);
+      toast({ 
+        title: "Erreur", 
+        description: "Impossible de télécharger le logo.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploadingLogo(null);
+    }
+  };
+
   const handleSubscriptionAdded = () => {
     refetch();
   };
@@ -84,7 +137,7 @@ const SubscriptionTable = () => {
   const handleSubscriptionUpdated = () => {
     setEditSubscription(null);
     refetch();
-    toast({ title: "Modifié", description: "L'abonnement a été mis à jour avec succès.", variant: "success" });
+    toast({ title: "Modifié", description: "L'abonnement a été mis à jour avec succès.", variant: "default" });
   };
 
   const handleDelete = async () => {
@@ -97,7 +150,7 @@ const SubscriptionTable = () => {
     setDeleting(false);
     setDeleteSubscription(null);
     if (!error) {
-      toast({ title: "Supprimé", description: "L'abonnement a été supprimé.", variant: "success" });
+      toast({ title: "Supprimé", description: "L'abonnement a été supprimé.", variant: "default" });
       refetch();
     } else {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
@@ -211,11 +264,38 @@ const SubscriptionTable = () => {
                   {filteredSubscriptions.map((subscription) => (
                     <TableRow key={subscription.id} className="hover:bg-muted/30 transition-colors">
                       <TableCell>
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-gradient-to-br from-easyweb-red to-easyweb-orange text-white font-semibold">
-                            {subscription.companyName.substring(0, 2).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="relative group">
+                          <Avatar className="h-10 w-10">
+                            {subscription.logo ? (
+                              <AvatarImage src={subscription.logo} alt={subscription.companyName} />
+                            ) : null}
+                            <AvatarFallback className="bg-gradient-to-br from-easyweb-red to-easyweb-orange text-white font-semibold">
+                              {subscription.companyName.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                            <label className="cursor-pointer">
+                              <Upload className="w-4 h-4 text-white" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                disabled={uploadingLogo === subscription.id}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    handleLogoUpload(subscription.id, file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                          {uploadingLogo === subscription.id && (
+                            <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       
                       <TableCell>
