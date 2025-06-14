@@ -18,8 +18,8 @@ const DashboardStats = () => {
           schema: 'public',
           table: 'subscriptions'
         },
-        () => {
-          console.log('Changement détecté dans les abonnements, mise à jour des statistiques...');
+        (payload) => {
+          console.log('Changement détecté dans les abonnements, mise à jour des statistiques...', payload);
           refetch(); // Recharger les données
         }
       )
