@@ -63,16 +63,10 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Nouvelles couleurs basées sur l'interface de référence
-				interface: {
-					primary: '#6366f1', // Bleu-violet primaire
-					secondary: '#8b5cf6', // Violet secondaire
-					gray: '#64748b', // Gris moderne
-					success: '#10b981', // Vert pour succès
-					warning: '#f59e0b', // Orange pour avertissement
-					danger: '#ef4444', // Rouge pour danger
-					light: '#f8fafc', // Fond clair
-					dark: '#1e293b' // Texte foncé
+				easyweb: {
+					red: '#ff4444',
+					orange: '#ff6600',
+					gray: '#2c2c2c'
 				}
 			},
 			borderRadius: {

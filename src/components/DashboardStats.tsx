@@ -14,31 +14,31 @@ const DashboardStats = () => {
       title: "Total des abonnements",
       value: totalSubscriptions,
       description: "Clients actifs",
-      color: "text-interface-primary"
+      color: "text-blue-600"
     },
     {
       title: "Paiements reçus",
       value: activeSubscriptions,
       description: "À jour",
-      color: "text-interface-success"
+      color: "text-green-600"
     },
     {
       title: "En attente",
       value: pendingSubscriptions,
       description: "Paiements attendus",
-      color: "text-interface-warning"
+      color: "text-yellow-600"
     },
     {
       title: "En retard",
       value: overdueSubscriptions,
       description: "Nécessitent relance",
-      color: "text-interface-danger"
+      color: "text-red-600"
     },
     {
       title: "Bientôt dus",
       value: dueSoon,
       description: "< 7 jours",
-      color: "text-interface-secondary"
+      color: "text-orange-600"
     }
   ];
 

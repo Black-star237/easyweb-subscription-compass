@@ -5,12 +5,12 @@ import SubscriptionTable from '@/components/SubscriptionTable';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-interface-light">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-interface-dark mb-2">
+          <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
             Gestionnaire d'abonnements
           </h1>
           <p className="text-muted-foreground">

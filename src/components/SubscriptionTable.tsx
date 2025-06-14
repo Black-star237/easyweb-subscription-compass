@@ -75,7 +75,7 @@ const SubscriptionTable = () => {
           <CardTitle className="text-xl font-semibold">
             Gestionnaire d'abonnements
           </CardTitle>
-          <Button className="bg-interface-primary hover:bg-interface-primary/90">
+          <Button className="bg-easyweb-red hover:bg-easyweb-red/90">
             <Plus className="w-4 h-4 mr-2" />
             Ajouter un abonnement
           </Button>
@@ -152,7 +152,7 @@ const SubscriptionTable = () => {
                 <TableRow key={subscription.id} className="hover:bg-muted/30 transition-colors">
                   <TableCell>
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-interface-primary to-interface-secondary text-white font-semibold">
+                      <AvatarFallback className="bg-gradient-to-br from-easyweb-red to-easyweb-orange text-white font-semibold">
                         {subscription.companyName.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -223,7 +223,7 @@ const SubscriptionTable = () => {
                       <Button variant="ghost" size="sm">
                         Détails
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-interface-danger hover:text-interface-danger/80">
+                      <Button variant="ghost" size="sm" className="text-easyweb-red hover:text-easyweb-red/80">
                         Relancer
                       </Button>
                     </div>
@@ -246,7 +246,7 @@ const SubscriptionTable = () => {
             <Button
               variant="outline"
               size="sm"
-              className="bg-interface-primary text-white hover:bg-interface-primary/90"
+              className="bg-easyweb-red text-white hover:bg-easyweb-red/90"
             >
               1
             </Button>
