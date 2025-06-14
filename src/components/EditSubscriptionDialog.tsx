@@ -27,24 +27,47 @@ const EditSubscriptionDialog: React.FC<EditSubscriptionDialogProps> = ({ subscri
 
   const onSubmit = async (values: Partial<Subscription>) => {
     if (!subscription) return;
-    const { error } = await supabase
-      .from("subscriptions")
-      .update({
-        company_name: values.companyName,
-        client_name: values.clientName,
-        whatsapp_number: values.whatsappNumber,
-        website_url: values.websiteUrl,
-        admin_url: values.adminUrl,
-        notion_url: values.notionUrl,
-        next_payment_date: values.nextPaymentDate,
-        notes: values.notes,
-      })
-      .eq("id", subscription.id);
-    if (!error) {
-      onSubscriptionUpdated();
+    
+    try {
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({
+          company_name: values.companyName,
+          client_name: values.clientName,
+          whatsapp_number: values.whatsappNumber,
+          website_url: values.websiteUrl,
+          admin_url: values.adminUrl,
+          notion_url: values.notionUrl,
+          next_payment_date: values.nextPaymentDate,
+          notes: values.notes,
+        })
+        .eq("id", subscription.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Fermer le dialog et déclencher la mise à jour
       onOpenChange(false);
-    } else {
-      toast({ title: "Erreur de modification", description: error.message, variant: "destructive" });
+      
+      // Attendre un court instant pour que la base de données soit mise à jour
+      setTimeout(() => {
+        onSubscriptionUpdated();
+      }, 100);
+
+      toast({ 
+        title: "Modifié", 
+        description: "L'abonnement a été mis à jour avec succès.", 
+        variant: "default" 
+      });
+
+    } catch (error) {
+      console.error('Erreur lors de la modification:', error);
+      toast({ 
+        title: "Erreur de modification", 
+        description: error instanceof Error ? error.message : "Une erreur est survenue", 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -65,7 +88,7 @@ const EditSubscriptionDialog: React.FC<EditSubscriptionDialogProps> = ({ subscri
           <Input {...register("notes")} placeholder="Notes" />
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
-              Enregistrer
+              {isSubmitting ? "Enregistrement..." : "Enregistrer"}
             </Button>
             <DialogClose asChild>
               <Button type="button" variant="ghost">

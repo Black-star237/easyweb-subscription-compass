@@ -135,9 +135,9 @@ const SubscriptionTable = () => {
   };
 
   const handleSubscriptionUpdated = () => {
+    console.log('Mise à jour déclenchée pour recalculer les champs automatiques');
     setEditSubscription(null);
     refetch();
-    toast({ title: "Modifié", description: "L'abonnement a été mis à jour avec succès.", variant: "default" });
   };
 
   const handleDelete = async () => {
