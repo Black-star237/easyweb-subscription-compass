@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User, AuthError } from '@supabase/supabase-js';
-import { Tables } from '@/integrations/supabase/types'; // Assurez-vous que ce chemin est correct
+import { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
 
@@ -32,35 +32,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const getInitialSession = async () => {
-      const { data: { session: initialSession } } = await supabase.auth.getSession();
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      if (initialSession?.user) {
-        await fetchProfile(initialSession.user.id);
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        if (initialSession?.user) {
+          await fetchProfile(initialSession.user.id);
+        }
+      } catch (err) {
+        console.error('Error getting initial session:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     getInitialSession();
 
     const { data: authListenerData } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        console.log("Auth state changed:", _event, newSession);
+      async (event, newSession) => {
+        console.log("Auth state changed:", event, newSession);
         setSession(newSession);
         setUser(newSession?.user ?? null);
+        
         if (newSession?.user) {
-          // Defer profile fetching to avoid potential deadlocks
+          // Use setTimeout to prevent deadlocks as per Supabase best practices
           setTimeout(async () => {
-            setLoading(true); // Set loading true before fetching profile
-            await fetchProfile(newSession.user.id);
-            setLoading(false); // Set loading false after fetching profile
+            try {
+              await fetchProfile(newSession.user.id);
+            } catch (err) {
+              console.error('Error fetching profile after auth change:', err);
+            }
           }, 0);
         } else {
           setProfile(null);
-          // Ensure loading is false if no user/session
-          // This might already be handled by getInitialSession's setLoading(false)
-          // but good to be explicit if a state change leads here without a user.
-          if (loading) setLoading(false);
         }
       }
     );
@@ -68,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => {
       authListenerData?.subscription.unsubscribe();
     };
-  }, [loading]); // Added loading to dependency array, as it's modified within setTimeout
+  }, []); // Removed loading dependency to prevent infinite loop
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -93,37 +97,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signIn: typeof supabase.auth.signInWithPassword = async (credentials) => {
     setLoading(true);
     setError(null);
-    const response = await supabase.auth.signInWithPassword(credentials);
-    if (response.error) setError(response.error);
-    setLoading(false);
-    return response;
+    try {
+      const response = await supabase.auth.signInWithPassword(credentials);
+      if (response.error) setError(response.error);
+      return response;
+    } catch (err) {
+      console.error('Sign in error:', err);
+      return { data: { user: null, session: null }, error: err as AuthError };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signUp: typeof supabase.auth.signUp = async (credentials) => {
     setLoading(true);
     setError(null);
-    // Assurez-vous d'inclure l'URL de redirection pour la confirmation par e-mail
-    const redirectUrl = `${window.location.origin}/`;
-    const response = await supabase.auth.signUp({
-      ...credentials,
-      options: {
-        emailRedirectTo: redirectUrl,
-        ...(credentials.options?.data && { data: credentials.options.data }),
-      }
-    });
-    if (response.error) setError(response.error);
-    setLoading(false);
-    return response;
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      const response = await supabase.auth.signUp({
+        ...credentials,
+        options: {
+          emailRedirectTo: redirectUrl,
+          ...(credentials.options?.data && { data: credentials.options.data }),
+        }
+      });
+      if (response.error) setError(response.error);
+      return response;
+    } catch (err) {
+      console.error('Sign up error:', err);
+      return { data: { user: null, session: null }, error: err as AuthError };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const signOut: typeof supabase.auth.signOut = async () => {
     setLoading(true);
     setError(null);
-    const response = await supabase.auth.signOut();
-    if (response.error) setError(response.error);
-    setProfile(null); // Effacer le profil lors de la déconnexion
-    setLoading(false);
-    return response;
+    try {
+      const response = await supabase.auth.signOut();
+      if (response.error) setError(response.error);
+      setProfile(null);
+      return response;
+    } catch (err) {
+      console.error('Sign out error:', err);
+      return { error: err as AuthError };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = {
@@ -139,4 +160,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-

@@ -5,22 +5,22 @@ import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const DashboardStats = () => {
-  const { subscriptions, loading, refetch } = useSubscriptions();
+  const { subscriptions, loading, error, refetch } = useSubscriptions();
 
-  // Écouter les changements en temps réel sur la table subscriptions
+  // Listen for real-time changes on the subscriptions table
   useEffect(() => {
     const channel = supabase
       .channel('subscription-changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // Écouter tous les événements (INSERT, UPDATE, DELETE)
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'subscriptions'
         },
         (payload) => {
-          console.log('Changement détecté dans les abonnements, mise à jour des statistiques...', payload);
-          refetch(); // Recharger les données
+          console.log('Subscription change detected, updating stats...', payload);
+          refetch(); // Reload data
         }
       )
       .subscribe();
@@ -48,19 +48,36 @@ const DashboardStats = () => {
     );
   }
 
-  // Calculer les statistiques réelles à partir des données de la base
-  const totalSubscriptions = subscriptions.length;
-  const activeSubscriptions = subscriptions.filter(s => s.paymentStatus === 'paid').length;
-  const pendingSubscriptions = subscriptions.filter(s => s.paymentStatus === 'pending').length;
-  const overdueSubscriptions = subscriptions.filter(s => s.paymentStatus === 'overdue').length;
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <Card className="col-span-full">
+          <CardContent className="p-6">
+            <div className="text-center text-red-600">
+              <p className="font-medium">Error loading statistics</p>
+              <p className="text-sm">{error}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Calculate real statistics from database data with safety checks
+  const totalSubscriptions = subscriptions?.length || 0;
+  const activeSubscriptions = subscriptions?.filter(s => s?.paymentStatus === 'paid')?.length || 0;
+  const pendingSubscriptions = subscriptions?.filter(s => s?.paymentStatus === 'pending')?.length || 0;
+  const overdueSubscriptions = subscriptions?.filter(s => s?.paymentStatus === 'overdue')?.length || 0;
   
-  // Calculer les abonnements qui expirent bientôt (dans les 7 prochains jours)
-  const dueSoon = subscriptions.filter(s => {
-    if (s.paymentStatus === 'paid' && s.daysRemaining <= 7 && s.daysRemaining > 0) {
-      return true;
+  // Calculate subscriptions expiring soon (within the next 7 days)
+  const dueSoon = subscriptions?.filter(s => {
+    try {
+      return s?.paymentStatus === 'paid' && s?.daysRemaining <= 7 && s?.daysRemaining > 0;
+    } catch (err) {
+      console.error('Error filtering due soon subscriptions:', err);
+      return false;
     }
-    return false;
-  }).length;
+  })?.length || 0;
 
   const stats = [
     {

@@ -7,21 +7,51 @@ import SubscriptionTable from '@/components/SubscriptionTable';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, error: authError } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!authLoading && !user) {
+      console.log('User not authenticated, redirecting to auth page');
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
 
-  if (authLoading || !user) {
+  // Show loading state while auth is being determined
+  if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-easyweb-red"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-easyweb-red mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
       </div>
     );
+  }
+
+  // Show error state if there's an auth error
+  if (authError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">
+            <p className="text-lg font-medium">Erreur d'authentification</p>
+            <p className="text-sm">{authError.message}</p>
+          </div>
+          <button 
+            onClick={() => navigate('/auth')}
+            className="bg-easyweb-red text-white px-4 py-2 rounded hover:bg-easyweb-red/90 transition-colors"
+          >
+            Retour à la connexion
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated (this should be handled by the useEffect above)
+  if (!user) {
+    return null;
   }
 
   return (
