@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import DashboardStats from '@/components/DashboardStats';
 import SubscriptionTable from '@/components/SubscriptionTable';
+import OfflineIndicator from '@/components/OfflineIndicator';
 import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
@@ -60,9 +61,12 @@ const Index = () => {
       
       <main className="container mx-auto px-6 py-8">
         <div className="mb-8 bg-white/70 backdrop-blur-md rounded-lg p-6 shadow-sm border border-white/20">
-          <h1 className="text-3xl font-bold text-easyweb-gray mb-2">
-            Gestionnaire d'abonnements
-          </h1>
+          <div className="flex justify-between items-start mb-2">
+            <h1 className="text-3xl font-bold text-easyweb-gray">
+              Gestionnaire d'abonnements
+            </h1>
+            <OfflineIndicator />
+          </div>
           <p className="text-gray-700">
             Gérez et suivez tous vos abonnements clients en un seul endroit
           </p>
